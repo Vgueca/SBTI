@@ -17,9 +17,10 @@ def spoly(f,g,ordering, selected_domain):
     lm_g = poly_g.LM(order=ordering).as_expr()
 
     lcm_result = lcm(lm_f, lm_g)
+    print("lcm: ", lcm_result)
 
     spoly = (((lcm_result / (poly_f.LT(order=ordering)[0].as_expr()) * poly_g.LC(order=ordering)) ) * poly_f.as_expr()) \
-            - ((  (lcm_result / (poly_g.LT(order=ordering)[0].as_expr()))  * poly_f.LC(order=ordering) ) * poly_g.as_expr()) 
+            - ((  (lcm_result / (poly_g.LT(order=ordering)[0].as_expr()))  * poly_f.LC(order=ordering) ) * poly_g.as_expr()) #aqui habia un error  porque habias utilizado poly_g.LC y poly_f.LC al reves
 
     #creemos que spoly esta bien hecha, son todo calculos y con el error que hemos corregido parece que los calculos los hace bien. Creemos que el error esta más abajo
     return simplify(spoly)
@@ -28,18 +29,22 @@ def NF_Butcher(f, G, ordering, selected_domain):
     '''Funcion que devuelve una forma normal usando NFBuchberger'''
     h = Poly(f, domain=selected_domain) if f != 0 else 0
     T = G.copy()
-    
-    
+
+
     while(h != 0):
-        Gh = [g for g in T if lcm(LM(g, order=ordering), LM(h, order=ordering)) == LM(h, order=ordering)]       
-        
+        Gh = [g for g in T if lcm(LM(g, order=ordering), LM(h, order=ordering)) == LM(h, order=ordering)]
+        for g in T:
+            print("Condicion del bucle:" ,lcm(LM(g, order=ordering), LM(h, order=ordering)) == LM(h, order=ordering)) #Hemos puesto esto para ver si la condicion es correcta, y parece que a priori se comporta como se tiene que comportar pero no estamos seguros de que la expresion este correcta, a pesar de que tiene sentido lo que has hecho.
+        print("Gh: ", Gh)  
+
+
         if not Gh:
             break
-        
+
         g = Gh[0]
         Gh.remove(g)
         h = spoly(h,g, ordering, selected_domain)
-        
+
     return h
 
 #Funcion que nos devuelve una base estándar siguiendo el algoritmo especificado en la hoja
@@ -53,21 +58,26 @@ def get_standart_base(domain, ordering, G, NF_func, spoly_func):
        - spoly_func: funcion que nos devuelve el s-polinomio dados dos polinomios'''
 
     S = G.copy()
-    P = {(f,g) for f,g in combinations(S,2)} #Nuestra lista de pares
+    P = [(f,g) for f,g in combinations(S,2)] #Nuestra lista de pares
 
     while (len(P) != 0):
-        f,g = P.pop();
-
+        f,g = P[0]
+        P.remove((f,g))
+        print("Esto es f: ", f)
+        print("Esto es g: ", g)
         s_polinomio = spoly_func(f,g, ordering, domain)
 
         h = NF_func(s_polinomio, S, ordering, domain)
-        if(h!=0):
-            h = h.as_expr()
-        
+        h = h.as_expr() #aqui hemos hecho as_expr porque si no en P se añadian objeto de al clase P con expresiones de polinomios. De esta forma todo lo que hay en P es del mismo tipo
+
+        #Indicaciones: Si comienzas a debugear haciendo prints te vas a dar cuenta que en la primera iteracion de este bucle no se añade nada a P, y que 
+        # en las siguientes no paran de añadirse elementos a S y por tanto muchas combinaciones a P. No entendemos por qué sigue dando vueltas el bucle
         if h != 0:
             for f in S:
-                P.add((h,f))
-            S.add(h)
+                P.append((h,f))
+            S.append(h)
+        print(P)
+    print("Ha terminado el bucle")
     return S
 
 
@@ -83,15 +93,15 @@ def Tjurina_generator(f, selected_domain):
 
     poly_f = Poly(f, domain=selected_domain) if f != 0 else 0
 
-    result = set() #Lista que devolveremos
+    result = [] #Lista que devolveremos
 
-    result.add(f)
+    result.append(f)
 
     diff_x = diff(poly_f,x).as_expr()
     diff_y = diff(poly_f,y).as_expr()
 
-    result.add(diff_x)
-    result.add(diff_y)
+    result.append(diff_x)
+    result.append(diff_y)
 
     return result
 #-----------------------------------------------
@@ -99,14 +109,14 @@ def Tjurina_generator(f, selected_domain):
 
 
 selected_domain = 'CC' #Nuestro dominio son los complejos, C[x,y]
-f = y**5 - x**7 + x**3*y**3 + x**4*y**4
+f = y**5 - x**7 + a*x**3*y**3 + b*x**4*y**4
 ordering = 'grevlex'
 
 tjurina = Tjurina_generator(f, selected_domain) #Obtenemos nuestro conjunto G, con (J)_f = (G)_R
 
-#print(tjurina)
+print(tjurina)
 
 # Pasamos a obtener nuestra base estándar
-base = get_standart_base(selected_domain,ordering,{y**7+x**9},NF_Butcher,spoly)
+base = get_standart_base(selected_domain,ordering,tjurina,NF_Butcher,spoly)
 
-print(base)
+# print(base)
