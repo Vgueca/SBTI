@@ -1,0 +1,239 @@
+\documentclass[10pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphics}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{csvsimple}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{enumitem}
+\usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
+
+\renewcommand*\contentsname{Índice} %Nombre del indice
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\begin{document}
+\lstset{
+	basicstyle=\footnotesize,
+	extendedchars=true,
+	literate={á}{{\'a}}1 {ã}{{\~a}}1 {é}{{\'e}}1 {ú}{{\'u}}1 {ó}{{\'o}}1,
+	backgroundcolor=\color{black!5}
+	}
+	
+\begin{titlepage}
+	\centering
+	{\includegraphics[scale=0.5]{Logo_UGR.png}\par}
+	\vspace{1cm}
+	{\bfseries\Large Facultad de Ciencas \par}
+	\vspace{2.5cm}
+	{\scshape\Huge Entrega de ejercicios 2: Bases Estándar\par}
+	\vspace{3cm}
+	{\itshape\Large Doble Grado Ingeniería Informática y Matemáticas}
+	\vfill
+	{\Large Autores: \par}
+	{\Large Javier Gómez López \par}
+	{\Large Juan Valentín Guerrero Cano \par}
+	\vfill
+	{\Large 23 de noviembre de 2023 \par}
+\end{titlepage}
+
+\thispagestyle{empty}
+\null
+\vfill
+
+%%Información sobre la licencia
+\parbox[t]{\textwidth}{
+  \includegraphics[scale=0.05]{by-nc-sa.png}\\[4pt]
+  \raggedright % Texto alineado a la izquierda
+  \sffamily\large
+  {\Large Este trabajo se distribuye bajo una licencia CC BY-NC-SA 4.0.}\\[4pt]
+  Eres libre de distribuir y adaptar el material siempre que reconozcas a los\\
+  autores originales del documento, no lo utilices para fines comerciales\\
+  y lo distribuyas bajo la misma licencia.\\[4pt]
+  \texttt{creativecommons.org/licenses/by-nc-sa/4.0/}
+}
+
+\newpage
+
+Sea \(R = \mathbb{C}[x,y]\) con el orden monomial \(>_{dp}\). Tomamos el polinomio \(f(x,y) = y^5 - x^7 + ax^3 y^3 + b x^4 y^4\) con \(a,b \in \mathbb{C}\). Se denomina ideal de Tjurina \((J)_f\) de \(f\) al ideal
+\[
+    \mathcal{J}_f := \left< f,  \partial f / \partial x, \partial f / \partial y\right>
+\]
+
+\begin{enumerate}[label=(\alph*)]
+	\item Usando el algoritmo 1, calcula las posibles bases estándar de \(\mathcal{J}_f\) en función del valor de los parámetros \(a\) y \(b\).
+	
+	En nuestro caso, hemos desarrollado en algoritmo en \texttt{Python}, y posteriormente hemos usado \texttt{Singular} para simplificar los resultados obtenidos y comprobarlos. 
+	
+	Nuestro programa de \texttt{Python} es el siguiente:
+	
+	\lstinputlisting[language=Python]{../obtener_base.py}
+	
+	Vamos a explicar cada función del código:
+	\begin{itemize}
+		\item \texttt{spoly}: Función que calcula el S-polinomio tal y cómo se explica en la referencia del libro.
+		\item \texttt{NF\_Butcher}: función que calcula la forma normal de Butcher según la referencia del libro. Será el algoritmo de forma normal que usaremos para obtener nuestra base estándar.
+		\item \texttt{get\_standart\_base}: el algoritmo que se encuentra al principio de la hoja implementado en \texttt{Python}.
+		\item \texttt{Tjurina\_generator}: función que calcula el ideal de Tjurina dado un polinomio.
+	\end{itemize}
+	
+	Para el estudio de las posibles bases estándar, vamos a distinguir casos:
+	\begin{itemize}
+		\item \( a=b=0\).
+		
+		En este caso, el resultado que nos arroja \texttt{Python} es el siguiente:
+			\[
+				\{ -x^7 + y^5, -7 x^6, 5 y^4 \}
+			\]
+			
+			Lo que vamos a hacer ahora es usar \texttt{Singular} para simplificar nuestra base. Para ello, realizamos los siguientes comandos:
+			\begin{lstlisting}[language=Python]
+				ring R = (0,a,b),(x,y),dp; //Definimos nuestra localizacion
+				ideal S = -x^7 + y^5, -7*x^6, 5*y^4;
+				S = simplify(S,32); S = simplify(S,2); S;
+			\end{lstlisting}
+			Y nos da la siguiente salida:
+			\[
+				\{-7x^6, 5y^4\}
+			\]
+			El comando \texttt{simplify} simplifica nuestro ideal. El argumento 32 borra los generadores que sus términos líderes son los por los términos líderes de otros generadores. El argumento 2 borra los generadores que sean 0. Para comprobar que el resultado es correcto, usaremos la función \texttt{std} de \texttt{Singular}, que calcula bases estándar:
+			\begin{lstlisting}[language=Python]
+				poly f = y^5 - x^7;
+				ideal S = f, jacob(f);
+				std(S);
+			\end{lstlisting}
+			Y nos da el siguiente resultado:
+			\[
+				\{x^6, y^4\}
+			\]
+			que es el mismo resultado que nuestra base simplificando (salvo constantes). En los casos que siguen, el método que usamos es el mismo.
+			
+			\medskip
+			
+			\item \(a = 0, b \neq 0\)
+			
+			En este caso, el resultado que nos arroja \texttt{Python} es el siguiente:
+			\[
+			\{bx^4y^4 - x^7 + y^5,4bx^3y^4 - 7x^6,4bx^4y^3 + 5y^4,3x^7 + 4y^5,13y^5,-195x^3y^4,91x^6y,-1365x^6,-455x^2y^4\}
+			\]
+			
+			Una vez simplificado en \texttt{Singular}, obtenemos que
+			\[
+				\{13 y^5, -455 x^2 y^4, -1365 x^6, 4b x^4 y^3 + 5 y^4\}
+			\]
+			
+			La comprobación de \texttt{Singular} nos dice la base estándar correcta es:
+			\[
+				\{y^5, x^2 y^4, x^6, 4b x^4y^3 + 5 y^4\}
+			\]
+			luego, nuestra solución es correcta (salvo constante).
+
+			\medskip			
+			
+			\item \(a \neq 0, b = 0\)
+			
+			En este caso, el resultado que nos arroja \texttt{Python} es el siguiente:
+			\[
+			\{ax^3y^3 - x^7 + y^5,3ax^2y^3 - 7x^6,3ax^3y^2 + 5y^4,-1y^5,y^4(-6ay^3 + 15x^4),-35x^3y^4\}
+			\]
+			
+			Una vez simplificado en \texttt{Singular}, obtenemos que
+			\[
+				\{-7 x^6 + 3a x^2 y^3, 3a x^3 y^2 + 5y^4, -y^5\}
+			\]
+			
+			La comprobación de \texttt{Singular} nos dice la base estándar correcta es:
+			\[
+				\{7 x^6 - 3a x^2 y^3, 3a x^3 y^2 + 5y^4, y^5\}
+			\]
+			luego, nuestra solución es correcta (salvo constante).
+			
+			\medskip			
+			
+			\item \(a \neq 0, b \neq 0\)
+			
+			En este caso, el resultado que nos arroja \texttt{Python} es el siguiente:
+			\[
+			\{ax^3y^3 + bx^4y^4 - x^7 + y^5,3ax^2y^3 + 4bx^3y^4 - 7x^6,3ax^3y^2 + 4bx^4y^3 + 5y^4,
+			\]
+			\[
+			ax^3y^3 + 3x^7 + 4y^5,y^3(7ax^3 + 13y^2),y^5(-63a^2x^2y + 336by^4 - 237x^3),y^2(-12a^2x^2y^3 - 8ax^6 + 64by^6 - 60x^3y^2),
+			\]
+			\[
+			y^5(21a + 273bxy),-21a^2x^2y^3 + 49ax^6 + 52by^6,-21a^2x^3y^2 - 35ay^4 + 52bxy^5,y^5(-105ay^3 + 273x^4),
+			\]
+			\[
+			y^6(-230459985a^2y - 1112792499x),y^4(-1857492a^3x^2y + 7930944aby^4 - 7223580ax^3 + 2070432bx^4y),
+			\]
+			\[
+			x^2y^2(-52920ay^3 + 137592x^4),y^4(132300ay^3 - 343980x^4),147a^2x^2y^5 - 3549by^8,
+			\]
+			\[
+			-1323a^3xy^5 - 91728b^2y^9 + 64701bx^3y^5, xy^5(105019740a^3y + 849493008ax + 4451169996bx^2y),
+			\]
+			\[
+			xy^5(-420078960a^3 + 26368956432bx^2),y^5(26460by^4 + 5292x^3),y^4(2160900by^4 + 432180x^3),
+			\]
+			\[
+			4096y^6,2.61310029691576e+16axy^5,536870912ay^5,461569425408x^2y^5,
+			\]
+			\[
+			xy^2(4445280a^2y^3 - 112687848ax^4 - 187813080xy^2),-4226826240y^5,ay^4(8589934592a^2x^2 - 68719476736by^3),
+			\]
+			\[
+			x^2y(9.46987077866619e+16ay^3 - 2.20963651502211e+17x^4),			
+			\]
+			\[
+			-1770209280x^3y^4,5310627840ax^2y^3 - 12391464960x^6\}
+			\]
+			
+			Una vez simplificado en \texttt{Singular}, obtenemos que
+			\[
+				\{7ax^3y^3+13y^5,49ax^6+52by^6-21a^2x^2y^3, 536870912ay^5,
+			\]
+			\[
+				-112687848ax^5y^2 - 187813080x^2y^4 + 4445280a^2xy^5\}
+			\]
+			
+			La comprobación de \texttt{Singular} nos dice la base estándar correcta es:
+			\[
+				\{y^5, 49ax^6+52by^6-21a^2x^2y^3, 
+			\]
+			\[
+				180075 a^7 x^3y^2 + 19307236 b y^5 + 300125a^6y^4 \}
+			\]
+			En este caso, observamos que no obtenemos la misma solución. Esto se debe a que nuestro programa en \texttt{Python} genera una base muy grande (17 elementos) y con unos coeficientes no del todo precisos (los \(10^x\) han perdido decimales). Es por ello que la base que nos arroja tiene 4 generadores, pero puesto que la correcta tiene 3, podemos deducir que la de nuestro programa también lo es pero con falta de precisión.
+	\end{itemize}
+\end{enumerate}
+
+\end{document}
