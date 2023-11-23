@@ -62,7 +62,11 @@
 	\vfill
 	{\Large Autores: \par}
 	{\Large Javier Gómez López \par}
+	{\Large Pablo Fuentes Jimenez \par}
+	{\Large Alejandro Rubio Martínez \par}
+	{\Large Inmaculada García Moreno \par}
 	{\Large Juan Valentín Guerrero Cano \par}
+	
 	\vfill
 	{\Large 23 de noviembre de 2023 \par}
 \end{titlepage}
@@ -234,6 +238,80 @@ Sea \(R = \mathbb{C}[x,y]\) con el orden monomial \(>_{dp}\). Tomamos el polinom
 			\]
 			En este caso, observamos que no obtenemos la misma solución. Esto se debe a que nuestro programa en \texttt{Python} genera una base muy grande (17 elementos) y con unos coeficientes no del todo precisos (los \(10^x\) han perdido decimales). Es por ello que la base que nos arroja tiene 4 generadores, pero puesto que la correcta tiene 3, podemos deducir que la de nuestro programa también lo es pero con falta de precisión.
 	\end{itemize}
-\end{enumerate}
+	\item Representa en \(\mathbb{N}^2\) el ideal líder asociado a cada base estándar.
+	
+	Para ello cogeremos cada una de las bases obtenidas en cada caso y calcularemos el ideal líder. Es decir, calcular el ideal formado por los monomios líderes de cada elemento de la base estándar y posteriormente representarlos en \(\mathbb{N}^2\). La representación hará referencia a los exponentes de las variables x e y respectivamente. Por ejemplo, en caso de que el monomio líder de un elemento sea $\{2x^2 y^4\}$, la representación de este monomio en \(\mathbb{N}^2\) sería (2,4).
+	
+	\begin{itemize}
+		\item \(a = 0, b = 0\) \\
+		En este caso la base que obtuvimos es la siguiente:
+		\[
+		\{-7x^6, 5y^4\}
+		\]
+		
+		El ideal líder formado por los monomios líderes de cada elemento sería:
+		\[
+		\{-7x^6, 5y^4\}
+		\]
+		Expresado en \(\mathbb{N}^2\) obtendríamos:
+		\[
+		\{ (6,0), (0,4)\}
+		\]
+		
+		
+		\item \(a = 0, b \neq 0\) \\
+		En este caso la base que obtuvimos es la siguiente:
+		\[
+		\{13 y^5, -455 x^2 y^4, -1365 x^6, 4b x^4 y^3 + 5 y^4\}
+		\]
+		
+		El ideal líder formado por los monomios líderes de cada elemento sería:
+		\[
+		\{13 y^5, -455 x^2 y^4, -1365 x^6, 4b x^4 y^3\}
+		\]
+		Donde podemos observar, que le único elemento de la base es el que realmente cambia. Expresado en \(\mathbb{N}^2\) obtendríamos:
+		\[
+		\{ (0,5), (2,4), (6,0), (4,3)\}
+		\]
+		
+		\item \(a \neq 0, b = 0\) \\
+		En este caso la base que obtuvimos es la siguiente:
+		\[
+		\{7 x^6 - 3a x^2 y^3, 3a x^3 y^2 + 5y^4, y^5\}
+		\]
+		
+		El ideal líder formado por los monomios líderes de cada elemento sería:
+		\[
+		\{7 x^6 , 3a x^3 y^2, y^5\}
+		\]
+		Expresado en \(\mathbb{N}^2\) obtendríamos:
+		\[
+		\{ (6,0), (3,2), (0,5)\}
+		\]
+		
+		
+		\item \(a \neq 0, b \neq 0\) \\
+		En este caso la base que obtuvimos es la siguiente:
+		\[
+		\{7ax^3y^3+13y^5,49ax^6+52by^6-21a^2x^2y^3, 536870912ay^5,
+		\]
+		\[
+		-112687848ax^5y^2 - 187813080x^2y^4 + 4445280a^2xy^5\}
+		\]
+		
+		El ideal líder formado por los monomios líderes de cada elemento sería:
+		\[
+		\{7ax^3y^3,49ax^6, 536870912ay^5,-112687848ax^5y^2 \}
+		\]
+		Expresado en \(\mathbb{N}^2\) obtendríamos:
+		\[
+		\{ (3,3), (6,0) , (0,5), (5,2)\}
+		\]
+	\end{itemize}
+	
+	\item Haz un resumen de las páginas 121 a la 130 de ” A singular introduction to commutative algebra”(Referencia principal de la asignatura)
+	
+	Este apartado se adjunta en un PDF a continuación, por facilidad a la hora de la división de trabajo del grupo.
+	\end{enumerate}
 
 \end{document}
