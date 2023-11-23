@@ -311,7 +311,263 @@ Sea \(R = \mathbb{C}[x,y]\) con el orden monomial \(>_{dp}\). Tomamos el polinom
 	
 	\item Haz un resumen de las páginas 121 a la 130 de ” A singular introduction to commutative algebra”(Referencia principal de la asignatura)
 	
-	Este apartado se adjunta en un PDF a continuación, por facilidad a la hora de la división de trabajo del grupo.
+	\textbf{Proposición 1} Sea \( M \) un \( A \)-módulo y \( N_1, N_2 \subset M \) submódulos, entonces \( (N_1 + N_2)/N_1 \cong N_2/(N_1 \cap N_2) \).
+
+\
+
+\textbf{Lema 2} Sea \( M \) un \( A \)-módulo. \( M \) es finitamente generado si y solo si \( M \cong A^n/L \) para un \( n \) adecuado en \( \mathbb{N} \) y un submódulo adecuado \( L \subset A^n \). Equivalentemente, existe un homomorfismo sobreyectivo \( \phi : A^n \to M \).
+
+\
+
+Sea \( A \) un anillo. Si \( M \) es un \( A \)-módulo finitamente generado, entonces \( M \cong A^n/L \) para algún \( L \subset A^n \). Si \( L \) es finitamente generado, \(\exists N \subset A^m\) tal que \( L \cong A^m/N \). Así, \( M \) es isomorfo al cokernel de un homomorfismo \( \phi: A^m \to A^n \), con \( \phi \) representado por una matriz \( n \times m \) al fijar bases en \( A^m \) y \( A^n \).
+
+\
+
+\textbf{Definición 3} Sea \( M \) un \( A \)-módulo. Decimos que \( M \) es de \textit{presentación finita} si existe una matriz \( n \times m \), denotada por \( \phi \), tal que \( M \) es isomorfo al cokernel del mapa \( A^m \xrightarrow{\phi} A^n \). La matriz \( \phi \) se llama \textit{matriz de presentación} de \( M \). Escribimos \( A^m \xrightarrow{\phi} A^n \to M \to 0 \) para denotar una presentación de \( M \).
+
+\
+
+En Singular, definir una matriz o un módulo puede interpretarse de dos maneras: como la matriz de presentación del módulo factor de \( A^n \) o como el submódulo de \( A^n \) generado por las columnas de la matriz.
+
+\
+
+\textbf{Ejemplo en Singular 4 (submódulos, presentación de un módulo):}
+Singular diferencia entre módulos y matrices. Un módulo se define por generadores, ya sea con corchetes o como combinación lineal de los generadores canónicos \( \text{gen}(1), \ldots, \text{gen}(n) \) de \( A^n \).
+
+\
+
+\textbf{Código de Ejemplo:}
+\begin{verbatim}
+ring A = 0,(x,y,z),dp;
+module N = [xy,0,yz],[0,xz,z2]; //submódulo de A^3
+show(N); //muestra los generadores como vectores
+print(N); //la matriz correspondiente
+\end{verbatim}
+
+Los módulos pueden sumarse y multiplicarse por un polinomio o un ideal. La adición de módulos implica la suma de módulos, diferente de la suma de matrices.
+
+\
+
+\textbf{Conversión de Tipos:}
+\begin{verbatim}
+module M = [xy,yz],[xz,z2]; //submódulo de A^2
+matrix MM = M; //conversión automática de tipo
+show(N+x*N); //operación de suma de módulos
+\end{verbatim}
+
+Se pueden convertir matrices a módulos y viceversa con \( \text{module}(matrix) \) y \( \text{matrix}(module) \).
+
+\
+
+\textbf{Operaciones en Módulos:}
+Las operaciones en módulos se consideran como operaciones en submódulos. Se puede calcular una presentación de \( M \) como submódulo de \( A^2 \) usando \( \text{syz}(M) \).
+
+\
+
+\textbf{Código de Ejemplo de Presentación:}
+\begin{verbatim}
+module K = syz(M); //calcula el kernel de M
+show(K); //presentación del módulo M
+\end{verbatim}
+
+\
+
+\textbf{Lema 5} Sean \( M \) y \( N \) dos \( A \)-módulos con presentaciones
+
+\[ A^m \xrightarrow{\phi} A^n \xrightarrow{\pi} M \to 0 \]
+\[ A^r \xrightarrow{\psi} A^s \xrightarrow{\kappa} N \to 0. \]
+
+\begin{enumerate}
+    \item Si \( \lambda: M \to N \) es un homomorfismo de \( A \)-módulos, entonces existen homomorfismos de \( A \)-módulos \( \alpha: A^m \to A^r \) y \( \beta: A^n \to A^s \) tales que el siguiente diagrama conmuta:
+
+   \[
+\begin{array}{cccccc}
+A^m & \xrightarrow{\phi} & A^n & \xrightarrow{\pi} & M & \rightarrow 0 \\
+\downarrow\scriptstyle{\alpha} & & \downarrow\scriptstyle{\beta} & & \downarrow\scriptstyle{\lambda} & \\
+A^r & \xrightarrow{\psi} & A^s & \xrightarrow{\kappa} & N & \rightarrow 0 \\
+\end{array}
+\]
+
+    Esto es, \( \beta \circ \phi = \psi \circ \alpha \) y \( \lambda \circ \pi = \kappa \circ \beta \).
+
+    \item Si \( \beta: A^n \to A^s \) es un homomorfismo de \( A \)-módulos tal que \( \beta(\text{Im}(\phi)) \subset \text{Im}(\psi) \), entonces existen homomorfismos de \( A \)-módulos \( \alpha: A^m \to A^r \) y \( \lambda: M \to N \) tales que el diagram anterior conmuta.
+\end{enumerate}
+
+\
+
+\textbf{Ejemplo SINGULAR 6 (cálculo de Hom)} usando las notaciones del Lema 5.
+\\
+Obtenemos el siguiente diagrama conmutativo:
+
+\[
+\begin{array}{cccccc}
+Hom(M,N) & \xrightarrow{\phi^{N}} & Hom(A^{r}, N) & \xrightarrow{\phi_{N}} & Hom(A^{m}, N) \\
+& & \uparrow\scriptstyle{\psi^{A}} & & \uparrow\scriptstyle{\psi_{A}} \\
+& & Hom(A^{r}, A^{s}) & \xrightarrow{\psi_{s}} & Hom(A^{m}, A^{s}) \\
+& & \downarrow\scriptstyle{j} & & \downarrow\scriptstyle{i} \\
+& & Hom(A^{r}, A^{t}) & \xrightarrow{\psi^{t}} & Hom(A^{m}, A^{t}) \\
+\end{array}
+\]
+
+Los mapas están definidos como en el Lema 2.1.5 (libro 'A Singular Introduction to Commutative Algebra') . En particular, \(\phi^*_N(\sigma) = \sigma \circ \phi\), \(\phi^*(\sigma) = \sigma \circ \phi\), \(i(\sigma) = \psi \circ \sigma\), y \(j(\sigma) = \psi \circ \sigma\). El Lema 5 y la Proposición 2.4.3 (libro 'A Singular Introduction to Commutative Algebra') implican que
+
+\[
+\text{Hom}(M, N) = \text{Ker}(\phi^*_N) \cong \phi^{*-1}(\text{Im}(i)) / \text{Im}(j).
+\]
+
+Utilizando el comando interno de Singular \texttt{modulo}, identificando como antes \(\text{Hom}(A^n, A^s) = A^{sn}\) y \(\text{Hom}(A^m, A^s) = A^{ms}\), tenemos que \(D := \phi^{*-1}(\text{Im}(i))\) es el núcleo de \(A^{ns} \overset{\phi^*}{\longrightarrow} A^{ms}/ \text{Im}(i)\), que es dado por una matriz \(ns \times k\) con entradas en \(A\), y podemos calcular \(\text{Hom}(M, N)\) como
+
+\[
+\phi^{*-1}(\text{Im}(i)) / \text{Im}(j) = \text{Ker}(A^k \overset{D}{\longrightarrow} A^{ns}/ \text{Im}(j)) = A^k \text{ modulo } (D, j).
+\]
+
+Finalmente, obtenemos el siguiente procedimiento con \(F = \phi^*\), \(B = i\), \(C = j\).
+
+\begin{verbatim}
+proc Hom(matrix M, matrix N)
+{
+    matrix F = kontraHom(M, nrows(N));
+    matrix B = kohom(N, ncols(M));
+    matrix C = kohom(N, nrows(M));
+    matrix D = modulo(F, B);
+    matrix E = modulo(D, C);
+    return(E);
+}
+\end{verbatim}
+
+\textbf{Definición 7} Sea \( M \) un \( A \)-módulo. Entonces se dice que \( M \) es Noetheriano si cada submódulo \( N \subset M \) es finitamente generado. 
+
+\
+
+\textbf{Lema 8}
+\begin{enumerate}
+    \item Los submódulos y módulos cociente de módulos Noetherianos son Noetherianos.
+    \item Sean \( N \subset M \) módulos de \( A \), entonces \( M \) es Noetheriano si y solo si \( N \) y \( M/N \) son Noetherianos.
+    \item Sea \( M \) un \( A \)-módulo, entonces las siguientes propiedades son equivalentes:
+    \begin{enumerate}
+        \item[\textbf{(a)}] \( M \) es Noetheriano.
+        \item[\textbf{(b)}] Toda cadena ascendente de submódulos \( M_1 \subset M_2 \subset \ldots \subset M_k \subset \ldots \) se estaciona, es decir, existe un \( n \) tal que para todo \( k \geq n \), \( M_k = M_n \).
+        \item[\textbf{(c)}] Todo conjunto no vacío de submódulos de \( M \) tiene un elemento maximal con respecto a la inclusión.
+    \end{enumerate}
+\end{enumerate}
+
+\
+
+\textbf{Proposición 9} Sea \( A \) un anillo Noetheriano y \( M \) un \( A \)-módulo finitamente generado, entonces \( M \) es un \( A \)-módulo Noetheriano.
+
+\
+
+\textbf{Lema 10 (Nakayama)} Sea \( A \) un anillo e \( I \subset A \) un ideal contenido en el radical de Jacobson de \( A \). Sea \( M \) un \( A \)-módulo finitamente generado y \( N \subset M \) un submódulo tal que \( M = IM + N \). Entonces \( M = N \). En particular, si \( M = IM \) entonces \( M = 0 \).
+
+\
+
+\textbf{Corolario 11} Sea \( (A, m) \) un anillo local y \( M \) un \( A \)-módulo finitamente generado. Sean \( m_1, \ldots, m_n \in M \) tales que sus clases forman un sistema de generadores para el espacio vectorial \( A/m \)-vector \( M/mM \). Entonces \( m_1, \ldots, m_n \) generan \( M \).
+
+\
+
+\textbf{Observación 12} Con las suposiciones del Corolario 11, \( \{m_1, \ldots, m_n\} \) es un sistema mínimo de generadores de \( M \) si y solo si sus clases forman una base de \( M/mM \), y entonces \( n \) es la dimensión del espacio vectorial \( A/m \)-vector \( M/mM \).
+
+\
+
+\textbf{Definición 13} Sea \( (A, m) \) un anillo local y \( M \) un \( A \)-módulo. Una presentación \( A^m \xrightarrow{\phi} A^n \rightarrow M \rightarrow 0 \) de \( M \) se llama una presentación mínima si \( n = \text{dim}_{A/m}(M/mM) \).
+
+\
+
+Si queremos minimizar la presentación de un módulo y encontramos un elemento inversible en la matriz de presentación, podemos usar operaciones de fila y columna para cambiar ese elemento a 1 y el resto de su fila y columna a 0. Eliminamos luego esa fila y columna, sin alterar el cokernel del módulo. Repetimos este proceso hasta que todos los elementos inversibles sean eliminados, logrando una presentación mínima. En el caso de que el anillo sea un campo, cualquier elemento no cero puede servir como pivote para una reducción de Gauss completa, lo cual es automatizado por el comando prune en Singular.
+
+\
+
+\textbf{Ejemplo 14 de SINGULAR} presentaciones mínimas y el uso del comando \texttt{prune}.
+Se define un anillo local \( A \) con ideal maximal \( \langle x, y, z \rangle \) y se trabaja con un \( A \)-módulo \( M \) generado por vectores con unidades en sus entradas. Al aplicar el comando \texttt{prune}, se simplifica la matriz de presentación de \( M \), eliminando las unidades y reduciéndola a una forma mínima que mantiene la estructura isomórfica del módulo. Esto es análogo a realizar una reducción de Gauss con elementos pivote que son unidades.
+
+\begin{verbatim}
+ring A = 0, (x, y, z), ds; // anillo local con ideal maximal <x, y, z>
+module M = [0, xy - 1, xy + 1], [y, xz, xz];
+print(M);
+// -> 0, y,
+// -> -1 + xy, xz,
+// -> 1 + xy, xz
+print(prune(M));
+// -> -y + xy^2,
+// -> -2xz
+\end{verbatim}
+
+Este procedimiento muestra la eficacia de \texttt{prune} para obtener una presentación mínima en un anillo local y destaca la diferencia cuando se trabaja en anillos no locales, donde las unidades en la matriz de presentación juegan un rol crucial en la simplificación.
+
+\
+
+\textbf{Corolario 15 (Teorema de la Intersección de Krull)}
+Sea \( A \) un anillo Noetheriano y \( I \subset A \) un ideal contenido en el radical de Jacobson, y sea \( M \) un \( A \)-módulo finitamente generado. Entonces, la intersección de todos los \( I^k M \) para \( k \) en los números naturales es igual a \( 0 \), es decir,
+\[ \bigcap_{k \in \mathbb{N}} I^k M = 0. \]
+
+\underline{Demostración.} Sea \( N := \bigcap_{k} I^k M \). \( N \) es un \( A \)-módulo finitamente generado, ya que es un submódulo del módulo finitamente generado \( M \) sobre el anillo Noetheriano \( A \). Por el Lema de Nakayama es suficiente demostrar que \( IN = N \). Sea
+\[ \mathcal{M} := \{ L \subseteq M \text{ submódulo } | L \cap N = N \} \].
+
+Dado que \( A \) es Noetheriano, el conjunto \( \mathcal{M} \) tiene un elemento maximal que llamaremos \( L \). Queda por demostrar que \( I^k M \subseteq L \) para algún \( k \), porque esto implica que la cadena se estabiliza ya que \( A \) es Noetheriano.
+
+\[ N = I^k M \cap N \subseteq L \cap N = IN \]. Dado que \( I \) es finitamente generado, basta demostrar que para cualquier \( x \in I \) hay algún entero positivo \( a \) tal que \( x^a M \subseteq L \). Sea \( x \in I \) y considere la cadena de ideales \( L : I (x) \subseteq L : I (x^2) \subseteq \cdots \). Esta cadena se estabiliza porque \( A \) es Noetheriano.
+
+Elija \( a \) con \( L : I (x^a) = L : I (x^{a+1}) \). Afirmamos que \( x^a M \subseteq L \). Por la maximalidad de \( L \) es suficiente probar que \( (L + x^a M) \cap N \subseteq IN \) (note que, obviamente, \( IN \subseteq (L + x^a M) \cap N \)). Sea \( m \in (L + x^a M) \cap N \), entonces \( m = n + x^a s \), con \( n \in N \), \( s \in M \). Ahora \( xm - xn = x^{a+1} s \in IN + L = L \), lo que implica \( s \in L : I (x^{a+1}) = L : I (x^a) \). Por lo tanto, \( x^a s \in L \) y, consecuentemente, \( m \in L \). Esto implica \( m \in L \cap N = IN \blacksquare \). 
+
+
+\
+
+\textbf{Definición 16}
+Sea \( A \) un anillo y \( S \subset A \) un subconjunto multiplicativamente cerrado. Sea \( M \) un \( A \)-módulo.
+
+\begin{enumerate}
+    \item Definimos la localización de \( M \) con respecto a \( S \), \( S^{-1}M \), de la siguiente manera:
+    \( S^{-1}M := \left\{ \frac{m}{s} \mid m \in M, s \in S \right\} \),
+    donde \( \frac{m}{s} \) denota la clase de equivalencia de \( (m, s) \in M \times S \) con respecto a la siguiente relación de equivalencia:
+    \( (m, s) \sim (m', s') \) si y solo si existe \( t \in S \) tal que \( t(s'm - sm') = 0 \).
+    Además, en \( S^{-1}M \) definimos una adición y multiplicación con elementos del anillo por las mismas fórmulas que para el campo de fracciones (ver antes de la Definición 1.4.4). También usaremos la notación \( M_S \) en lugar de \( S^{-1}M \). Si \( S = \{1, f, f^2, \ldots\} \) entonces escribimos \( M_f \) en lugar de \( S^{-1}M \). Si \( S = A \setminus P \), \( P \) un ideal primo, escribimos \( M_P \) en lugar de \( S^{-1}M \).
+
+    \item Sea \( \phi: M \rightarrow N \) un homomorfismo de \( A \)-módulos, entonces definimos el homomorfismo inducido de \( S^{-1}A \)-módulos,
+    \( \phi_S: M_S \rightarrow N_S \), \( \frac{m}{s} \mapsto \frac{\phi(m)}{s} \).
+    
+\end{enumerate}
+
+\
+
+\textbf{Proposición 17}
+Sea \( A \) un anillo y \( S \subset A \) un subconjunto cerrado bajo la multiplicación. Sean \( M, N \) \( A \)-módulos y \( \phi: M \rightarrow N \) un homomorfismo de \( A \)-módulos. Entonces:
+
+\begin{enumerate}
+    \item El núcleo de \( \phi_S \), la localización de \( \phi \) con respecto a \( S \), es igual a la localización del núcleo de \( \phi \) con respecto a \( S \), es decir, \( \text{Ker}(\phi_S) = \text{Ker}(\phi)_S \).
+    \item La imagen de \( \phi_S \) es igual a la localización de la imagen de \( \phi \) con respecto a \( S \), es decir, \( \text{Im}(\phi_S) = \text{Im}(\phi)_S \).
+    \item El cokernel de \( \phi_S \) es igual al cokernel de \( \phi \) localizado con respecto a \( S \), es decir, \( \text{Coker}(\phi_S) = \text{Coker}(\phi)_S \).
+\end{enumerate}
+
+En particular, la localización con respecto a \( S \) es un functor exacto. Es decir, si \( 0 \rightarrow M' \rightarrow M \rightarrow M'' \rightarrow 0 \) es una secuencia exacta de \( A \)-módulos, entonces \( 0 \rightarrow M'_S \rightarrow M_S \rightarrow M''_S \rightarrow 0 \) es una secuencia exacta de \( A_S \)-módulos.
+
+\
+
+\textbf{Proposición 18}
+Sea \( A \) un anillo y \( M \) un \( A \)-módulo. Las siguientes condiciones son equivalentes:
+\begin{enumerate}
+    \item \( M = 0 \).
+    \item \( M_P = 0 \) para todos los ideales primos \( P \).
+    \item \( M_m = 0 \) para todos los ideales maximales \( m \).
+\end{enumerate}
+
+\
+
+\textbf{Corolario 19}
+Sea \( A \) un anillo, \( M, N \) \( A \)-módulos, y \( \phi: M \rightarrow N \) un homomorfismo de \( A \)-módulos. Entonces \( \phi \) es inyectivo (respectivamente sobreyectivo) si y solo si \( \phi_m \) es inyectivo (respectivamente sobreyectivo) para todos los ideales maximales \( m \).
+
+\ 
+
+\textbf{Definición 20}
+Sea \( A \) un anillo y \( M \) un \( A \)-módulo. El soporte de \( M \), denotado por \( \text{supp}(M) \), se define por
+\[ \text{supp}(M) := \{ P \subset A \text{ ideal primo} \mid M_P \neq 0 \} \].
+
+\
+
+\textbf{Lema 21}
+Sea \( A \) un anillo y \( M \) un \( A \)-módulo finitamente generado. Entonces
+\[ \text{supp}(M) = \{ P \subset A \text{ ideal primo} \mid P \supset \text{Ann}(M) \} =: V(\text{Ann}(M)) \].
+
+
 	\end{enumerate}
 
 \end{document}
