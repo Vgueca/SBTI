@@ -1,5 +1,5 @@
-# Base-Standard-de-Ideales
-Cálculo de la base estandar del ideal de Tjurina
+# Standard Base of the Tjurina Ideal
+This code provides an approach to compute standard basis of the Tjurina ideal. It has been developed for university projects, so it may be improvable.
 
-## Contacto
-Para más información pueden contactar a [jvgueca@gmail.com](mailto:jvgueca@gmail.com).
+## Contact
+To get more information: [jvgueca@gmail.com](mailto:jvgueca@gmail.com).
